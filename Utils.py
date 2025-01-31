@@ -32,16 +32,10 @@ def read_first_page_excel(folder_path='./Data/Price'):
                 print(f"Could not read file {file_path}: {e}")
     return excel_contents
 
-def create_price_architecture_report(output_format='pdf', output_path='./Data/Report'):
+def create_price_architecture_report(data, output_format='pdf', output_path='./Data/Report'):
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
-    # Sample data for demonstration
-    data = {
-        'Reference': ['Ref1', 'Ref2', 'Ref3'],
-        'Price': [100, 200, 300],
-        'Architecture': ['Arch1', 'Arch2', 'Arch3']
-    }
     df = pd.DataFrame(data)
 
     if output_format == 'excel':
