@@ -1,8 +1,8 @@
 from dotenv import load_dotenv
-from Utils import read_datasheet_contents
+from Utils import read_datasheet_contents, create_price_architecture_report
 from smolagents.agents import ToolCallingAgent
 from smolagents import tool, ManagedAgent
-from typing import Optional
+from typing import Optional, Any
 from ai_agent import model
 import json
 
@@ -58,23 +58,25 @@ def check_requirements(DO_needed: Optional[str],
 
 
 @tool
-def check_architecture_requirements(Architectures: str) -> str:
+def format_architecture(Architectures: str) -> dict[str, str | Any]:
     """
     Check if a single architecture fits all information needed
 
     Args:
         Architectures: a list of all architectures found, shall follow the following structure
-            {[
-            {Name: a name or title for this architecture, like "1x TTC 32",
-            Reference: the ECU reference, as an example TTC 580,
-            Number: number of this reference needed to cover the need, shall be a number,
-            Software: the platform, can only be C, MATCH, Codesys, Qt}
-            ]}
+            {
+                "Name": "a name or title for this architecture, like '1x TTC 32'",
+                "Reference": "the ECU reference, as an example TTC 580",
+                "Number": "number of this reference needed to cover the need, shall be a number",
+                "Software": "the platform, can only be C, MATCH, Codesys, Qt"
+            }
 
     Returns:
-        str: the missing information it there is one, else success, mandatory data has been provided
+        missing_info: the missing information it there is one, else success, mandatory data has been provided
+        data: updated Architectures in JSON format with only mandatory fields
     """
     missing_info = []
+    data_updated = False
     data = json.loads(Architectures)
     required_fields = {"Name", "Reference", "Number", "Software"}
     for architecture in data:
@@ -82,6 +84,7 @@ def check_architecture_requirements(Architectures: str) -> str:
         keys_to_remove = set(architecture.keys()) - required_fields
         for key in keys_to_remove:
             del architecture[key]
+            data_updated = True
         missing = []
         if not architecture.get("Name"):
             missing.append("Name")
@@ -97,15 +100,26 @@ def check_architecture_requirements(Architectures: str) -> str:
 
     return {
         "missing_info": "\n".join(missing_info) if missing_info else "All mandatory fields present",
-        "data": data
+        "data": data if data_updated else Architectures
     }
 
-agent = ToolCallingAgent(tools=[get_datasheet_content, check_requirements, check_architecture_requirements], model=model)
+agent = ToolCallingAgent(tools=[get_datasheet_content, check_requirements, format_architecture], model=model)
 
 managed_architecture_define_agent = ManagedAgent(
     agent=agent,
     name="architecture_designer",
     description="""You will be tasked to help design and promote the best TTControl ECU architecture""",
+    managed_agent_prompt="""You're a helpful agent named '{name}'.
+You have been submitted this task by your manager.
+---
+Task:
+{task}
+---
+You're helping your manager solve a wider task: so make sure to provide a short answer in JSON format
+
+If your task resolution is not successful, please return as much context as possible, 
+so that your manager can act upon this feedback.
+{{additional_prompting}}""",
     additional_prompting ="""You have to follow this steps to define the better solution:
         1: check if there is no missing arguments, you have to have enough information
         2: get all technical information like datasheet and all documentation to better know the ECU product portfolio
@@ -115,13 +129,19 @@ managed_architecture_define_agent = ManagedAgent(
         
         below is an example of expected output
         
-        {[
-            {Name: "1x TTC 32",
-            Reference: "TTC 32",
-            Number: "1",
-            Software: "Codesys"}
+        {"Architecture":[
+            {
+                "Name": "2x TTC 32",
+                "Reference": "TTC 32",
+                "Number": "2",
+                "Software": "Codesys"
+            },
+            {
+                "Name": "1x TTC 580",
+                "Reference": "TTC 580",
+                "Number": "1",
+                "Software": "MATCH"
+            }
         ]}
     """
 )
-
-
