@@ -45,7 +45,6 @@ def check_requirements(DO_needed: Optional[str],
     Returns:
         str: the missing information it there is one, else success, mandatory data has been provided
     """
-    # Temporary implementation to avoid syntax errors
     missing = []
     if not PWM_needed:
         missing.append("PWM_needed")
@@ -73,16 +72,22 @@ def check_architecture_requirements(Architectures: str) -> str:
         str: the missing information it there is one, else success, mandatory data has been provided
     """
     # Temporary implementation to avoid syntax errors
-    missing = []
-    for Architecture in Architectures:
-        if not Reference:
+    missing_info = []
+    for architecture in Architectures:
+        missing = []
+        if not architecture.get("Name"):
+            missing.append("Name")
+        if not architecture.get("Reference"):
             missing.append("Reference")
-        if not Number:
+        if not architecture.get("Number"):
             missing.append("Number")
-        if not Software:
+        if not architecture.get("Software"):
             missing.append("Software")
+        
+        if missing:
+            missing_info.append(f"Architecture {architecture.get('Name', 'Unnamed')}: Missing {', '.join(missing)}")
 
-    return f"Missing: {', '.join(missing)}" if missing else "All mandatory fields present"
+    return "\n".join(missing_info) if missing_info else "All mandatory fields present"
 
 agent = ToolCallingAgent(tools=[get_datasheet_content, check_requirements, check_architecture_requirements], model=model)
 
