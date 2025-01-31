@@ -76,7 +76,7 @@ def create_price_architecture_report(data_str, output_format='pdf', output_path=
             y_position -= 20
             c.drawString(100, y_position, f"Price: {price}")
             y_position -= 40  # Add extra space between entries
-        c.save()
-        else:
-            raise ValueError("Unsupported format. Use 'pdf' or 'excel'.")
+            c.save()
+    else:
+        raise ValueError("Unsupported format. Use 'pdf' or 'excel'.")
     return file_path
