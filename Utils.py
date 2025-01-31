@@ -35,6 +35,7 @@ def read_first_page_excel(folder_path='./Data/Price'):
 
 def create_price_architecture_report(data_str, output_format='pdf', output_path='./Data/Report'):
     data = json.loads(data_str)
+    file_path = None
     architecture = data.get("Architecture", {})
     if not os.path.exists(output_path):
         os.makedirs(output_path)
