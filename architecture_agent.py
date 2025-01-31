@@ -76,7 +76,12 @@ def check_architecture_requirements(Architectures: str) -> str:
     """
     missing_info = []
     data = json.loads(Architectures)
+    required_fields = {"Name", "Reference", "Number", "Software"}
     for architecture in data:
+        # Remove unnecessary fields
+        keys_to_remove = set(architecture.keys()) - required_fields
+        for key in keys_to_remove:
+            del architecture[key]
         missing = []
         if not architecture.get("Name"):
             missing.append("Name")
