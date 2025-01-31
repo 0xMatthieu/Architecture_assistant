@@ -1,6 +1,5 @@
 from ai_agent import call_agent
 
-
 if __name__ == "__main__":
     print("start")
     debug = False
