@@ -47,14 +47,14 @@ def create_price_architecture_report(data_str, output_format='pdf', output_path=
         width, height = letter
         y_position = height - 100
         for product in data:
-        if y_position < 100:  # Start a new page if space is insufficient
-            c.showPage()
-            y_position = height - 100
-        reference = product.get("Reference", "")
-        designation = product.get("Designation", "")
-        article_number = product.get("Article_number", "")
-        quantity = product.get("Quantity", "")
-        price = product.get("Price", "")
+            if y_position < 100:  # Start a new page if space is insufficient
+                c.showPage()
+                y_position = height - 100
+            reference = product.get("Reference", "")
+            designation = product.get("Designation", "")
+            article_number = product.get("Article_number", "")
+            quantity = product.get("Quantity", "")
+            price = product.get("Price", "")
 
 
         df = pd.DataFrame([product])
