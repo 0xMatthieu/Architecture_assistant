@@ -74,7 +74,6 @@ def check_architecture_requirements(Architectures: str) -> str:
     Returns:
         str: the missing information it there is one, else success, mandatory data has been provided
     """
-    # Temporary implementation to avoid syntax errors
     missing_info = []
     data = json.loads(Architectures)
     for architecture in data:
