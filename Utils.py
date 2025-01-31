@@ -37,31 +37,29 @@ def read_first_page_excel(folder_path='./Data/Price'):
 def create_price_architecture_report(data_str, output_format='pdf', output_path='./Data/Report'):
     data = json.loads(data_str)
     file_path = None
-    architecture = data.get("Architecture", [])
+    architectures = data.get("Architecture", [])
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
-    for arch_name, arch_details in architecture:
-        description = arch_details.get("description", "")
-        choices = arch_details.get("choices", [])
+    for architecture in architectures:
+        name = architecture.get("Name", "Unnamed")
+        reference = architecture.get("Reference", "")
+        number = architecture.get("Number", "")
+        software = architecture.get("Software", "")
 
-        df = pd.DataFrame(choices)
+        df = pd.DataFrame([architecture])
 
         if output_format == 'excel':
-            file_path = os.path.join(output_path, f'{arch_name}_report.xlsx')
+            file_path = os.path.join(output_path, f'{name}_report.xlsx')
             df.to_excel(file_path, index=False)
         elif output_format == 'pdf':
-            file_path = os.path.join(output_path, f'{arch_name}_report.pdf')
+            file_path = os.path.join(output_path, f'{name}_report.pdf')
             c = canvas.Canvas(file_path, pagesize=letter)
             width, height = letter
-            c.drawString(100, height - 100, f"{arch_name} Report")
-            c.drawString(100, height - 120, description)
-            for i, choice in enumerate(choices):
-                ref = choice.get("Reference", "")
-                article_number = choice.get("Article number", "")
-                quantities = choice.get("Quantity", [])
-                prices = choice.get("Price", [])
-                c.drawString(100, height - 150 - i * 20, f"{ref} ({article_number}): Quantities {quantities} - Prices {prices}")
+            c.drawString(100, height - 100, f"{name} Report")
+            c.drawString(100, height - 120, f"Reference: {reference}")
+            c.drawString(100, height - 140, f"Number: {number}")
+            c.drawString(100, height - 160, f"Software: {software}")
             c.save()
         else:
             raise ValueError("Unsupported format. Use 'pdf' or 'excel'.")
