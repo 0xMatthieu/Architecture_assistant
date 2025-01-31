@@ -8,6 +8,16 @@ This project is designed to help design and promote the best TTControl ECU archi
 - **Generate Reports**: Creates PDF or Excel reports based on architecture and price data.
 - **Check Requirements**: Validates that all necessary architecture requirements are met.
 
+## Project Structure
+
+The project is organized into several key files and directories:
+
+- **Utils.py**: Contains utility functions for reading datasheets, generating reports, and handling Excel files.
+- **price_strategy_agent.py**: Implements tools for generating price and architecture reports and managing the price strategy agent.
+- **architecture_agent.py**: Provides tools for checking architecture requirements and formatting architecture data.
+- **Data/**: Directory containing datasheets and price lists used by the application.
+- **.env**: Environment configuration file for setting up necessary environment variables.
+
 ## Setup
 
 1. **Clone the Repository**:
