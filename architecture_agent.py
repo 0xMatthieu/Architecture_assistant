@@ -95,7 +95,10 @@ def check_architecture_requirements(Architectures: str) -> str:
         if missing:
             missing_info.append(f"Architecture {architecture.get('Name', 'Unnamed')}: Missing {', '.join(missing)}")
 
-    return "\n".join(missing_info) if missing_info else "All mandatory fields present"
+    return {
+        "missing_info": "\n".join(missing_info) if missing_info else "All mandatory fields present",
+        "data": data
+    }
 
 agent = ToolCallingAgent(tools=[get_datasheet_content, check_requirements, check_architecture_requirements], model=model)
 
