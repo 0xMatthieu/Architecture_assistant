@@ -33,6 +33,7 @@ def read_first_page_excel(folder_path='./Data/Price'):
                 print(f"Could not read file {file_path}: {e}")
     return excel_contents
 
+
 def create_price_architecture_report(data_str, output_format='pdf', output_path='./Data/Report'):
     data = json.loads(data_str)
     file_path = None
