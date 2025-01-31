@@ -3,6 +3,7 @@ import fitz  # PyMuPDF
 import pandas as pd
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+import json
 
 def read_datasheet_contents(folder_path='./Data/Datasheet'):
     pdf_contents = []
@@ -32,23 +33,34 @@ def read_first_page_excel(folder_path='./Data/Price'):
                 print(f"Could not read file {file_path}: {e}")
     return excel_contents
 
-def create_price_architecture_report(data, output_format='pdf', output_path='./Data/Report'):
+def create_price_architecture_report(data_str, output_format='pdf', output_path='./Data/Report'):
+    data = json.loads(data_str)
+    architecture = data.get("Architecture", {})
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
-    df = pd.DataFrame(data)
+    for arch_name, arch_details in architecture.items():
+        description = arch_details.get("description", "")
+        choices = arch_details.get("choices", [])
 
-    if output_format == 'excel':
-        file_path = os.path.join(output_path, 'price_architecture_report.xlsx')
-        df.to_excel(file_path, index=False)
-    elif output_format == 'pdf':
-        file_path = os.path.join(output_path, 'price_architecture_report.pdf')
-        c = canvas.Canvas(file_path, pagesize=letter)
-        width, height = letter
-        c.drawString(100, height - 100, "Price and Architecture Report")
-        for i, (ref, price, arch) in enumerate(zip(data['Reference'], data['Price'], data['Architecture'])):
-            c.drawString(100, height - 150 - i * 20, f"{ref}: {price} - {arch}")
-        c.save()
-    else:
-        raise ValueError("Unsupported format. Use 'pdf' or 'excel'.")
+        df = pd.DataFrame(choices)
+
+        if output_format == 'excel':
+            file_path = os.path.join(output_path, f'{arch_name}_report.xlsx')
+            df.to_excel(file_path, index=False)
+        elif output_format == 'pdf':
+            file_path = os.path.join(output_path, f'{arch_name}_report.pdf')
+            c = canvas.Canvas(file_path, pagesize=letter)
+            width, height = letter
+            c.drawString(100, height - 100, f"{arch_name} Report")
+            c.drawString(100, height - 120, description)
+            for i, choice in enumerate(choices):
+                ref = choice.get("Reference", "")
+                article_number = choice.get("Article number", "")
+                quantities = choice.get("Quantity", [])
+                prices = choice.get("Price", [])
+                c.drawString(100, height - 150 - i * 20, f"{ref} ({article_number}): Quantities {quantities} - Prices {prices}")
+            c.save()
+        else:
+            raise ValueError("Unsupported format. Use 'pdf' or 'excel'.")
     return file_path
