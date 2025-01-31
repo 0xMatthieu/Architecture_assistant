@@ -37,17 +37,19 @@ def read_first_page_excel(folder_path='./Data/Price'):
 def create_price_architecture_report(data_str, output_format='pdf', output_path='./Data/Report'):
     data = json.loads(data_str)
     file_path = None
-    architectures = data.get("Architecture", [])
+    name = 'test'
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
-    for architecture in architectures:
-        name = architecture.get("Name", "Unnamed")
-        reference = architecture.get("Reference", "")
-        number = architecture.get("Number", "")
-        software = architecture.get("Software", "")
+    for product in data:
+        reference = product.get("Reference", "")
+        designation = product.get("Designation", "")
+        article_number = product.get("Article_number", "")
+        quantity = product.get("Quantity", "")
+        price = product.get("Price", "")
 
-        df = pd.DataFrame([architecture])
+
+        df = pd.DataFrame([product])
 
         if output_format == 'excel':
             file_path = os.path.join(output_path, f'{name}_report.xlsx')
@@ -58,8 +60,10 @@ def create_price_architecture_report(data_str, output_format='pdf', output_path=
             width, height = letter
             c.drawString(100, height - 100, f"{name} Report")
             c.drawString(100, height - 120, f"Reference: {reference}")
-            c.drawString(100, height - 140, f"Number: {number}")
-            c.drawString(100, height - 160, f"Software: {software}")
+            c.drawString(100, height - 140, f"Designation: {designation}")
+            c.drawString(100, height - 140, f"Article number: {article_number}")
+            c.drawString(100, height - 140, f"Quantity: {quantity}")
+            c.drawString(100, height - 140, f"Price: {price}")
             c.save()
         else:
             raise ValueError("Unsupported format. Use 'pdf' or 'excel'.")
