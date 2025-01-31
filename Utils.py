@@ -1,6 +1,8 @@
 import os
 import fitz  # PyMuPDF
 import pandas as pd
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
 
 def read_datasheet_contents(folder_path='./Data/Datasheet'):
     pdf_contents = []
@@ -29,3 +31,30 @@ def read_first_page_excel(folder_path='./Data/Price'):
             except Exception as e:
                 print(f"Could not read file {file_path}: {e}")
     return excel_contents
+
+def create_price_architecture_report(output_format='pdf', output_path='./Data/Report'):
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+
+    # Sample data for demonstration
+    data = {
+        'Reference': ['Ref1', 'Ref2', 'Ref3'],
+        'Price': [100, 200, 300],
+        'Architecture': ['Arch1', 'Arch2', 'Arch3']
+    }
+    df = pd.DataFrame(data)
+
+    if output_format == 'excel':
+        file_path = os.path.join(output_path, 'price_architecture_report.xlsx')
+        df.to_excel(file_path, index=False)
+    elif output_format == 'pdf':
+        file_path = os.path.join(output_path, 'price_architecture_report.pdf')
+        c = canvas.Canvas(file_path, pagesize=letter)
+        width, height = letter
+        c.drawString(100, height - 100, "Price and Architecture Report")
+        for i, (ref, price, arch) in enumerate(zip(data['Reference'], data['Price'], data['Architecture'])):
+            c.drawString(100, height - 150 - i * 20, f"{ref}: {price} - {arch}")
+        c.save()
+    else:
+        raise ValueError("Unsupported format. Use 'pdf' or 'excel'.")
+    return file_path
