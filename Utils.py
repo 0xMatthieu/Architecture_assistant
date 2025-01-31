@@ -46,18 +46,7 @@ def create_price_architecture_report(data_str, output_format='pdf', output_path=
         c = canvas.Canvas(file_path, pagesize=letter)
         width, height = letter
         y_position = height - 100
-        for product in data:
-            if y_position < 100:  # Start a new page if space is insufficient
-                c.showPage()
-                y_position = height - 100
-            reference = product.get("Reference", "")
-            designation = product.get("Designation", "")
-            article_number = product.get("Article_number", "")
-            quantity = product.get("Quantity", "")
-            price = product.get("Price", "")
-
-
-        df = pd.DataFrame([product])
+        df = pd.DataFrame(data)
 
         if output_format == 'excel':
             file_path = os.path.join(output_path, f'{name}_report.xlsx')
@@ -66,16 +55,26 @@ def create_price_architecture_report(data_str, output_format='pdf', output_path=
             file_path = os.path.join(output_path, f'{name}_report.pdf')
             c = canvas.Canvas(file_path, pagesize=letter)
             width, height = letter
-            c.drawString(100, y_position, f"Reference: {reference}")
-            y_position -= 20
-            c.drawString(100, y_position, f"Designation: {designation}")
-            y_position -= 20
-            c.drawString(100, y_position, f"Article number: {article_number}")
-            y_position -= 20
-            c.drawString(100, y_position, f"Quantity: {quantity}")
-            y_position -= 20
-            c.drawString(100, y_position, f"Price: {price}")
-            y_position -= 40  # Add extra space between entries
+            y_position = height - 100
+            for index, row in df.iterrows():
+                if y_position < 100:  # Start a new page if space is insufficient
+                    c.showPage()
+                    y_position = height - 100
+                reference = row.get("Reference", "")
+                designation = row.get("Designation", "")
+                article_number = row.get("Article_number", "")
+                quantity = row.get("Quantity", "")
+                price = row.get("Price", "")
+                c.drawString(100, y_position, f"Reference: {reference}")
+                y_position -= 20
+                c.drawString(100, y_position, f"Designation: {designation}")
+                y_position -= 20
+                c.drawString(100, y_position, f"Article number: {article_number}")
+                y_position -= 20
+                c.drawString(100, y_position, f"Quantity: {quantity}")
+                y_position -= 20
+                c.drawString(100, y_position, f"Price: {price}")
+                y_position -= 40  # Add extra space between entries
             c.save()
     else:
         raise ValueError("Unsupported format. Use 'pdf' or 'excel'.")
