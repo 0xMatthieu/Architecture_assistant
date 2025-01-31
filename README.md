@@ -12,6 +12,8 @@ This project is designed to help design and promote the best TTControl ECU archi
 
 The project is organized into several key files and directories:
 
+- **Main.py**: The entry point of the application, responsible for initializing and running the agent.
+- **ai_agent.py**: Configures the AI model and manages the interaction with the agent.
 - **Utils.py**: Contains utility functions for reading datasheets, generating reports, and handling Excel files.
 - **price_strategy_agent.py**: Implements tools for generating price and architecture reports and managing the price strategy agent.
 - **architecture_agent.py**: Provides tools for checking architecture requirements and formatting architecture data.
