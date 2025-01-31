@@ -1,0 +1,7 @@
+#discord
+python-dotenv
+#pydantic
+smolagents
+openai
+litellm
+pymupdf
