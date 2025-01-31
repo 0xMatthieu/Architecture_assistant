@@ -11,9 +11,10 @@ load_dotenv()
 def get_datasheet_content() -> str:
     """
     Returns:
-    str: the content of all documents, which will be used to define architecture
+
+        str: the content of all documents, which will be used to define architecture
     """
-    content = read_datasheet_contents()
+    content = read_datasheet_contents(folder_path='./Data/Datasheet')
     output = f"""## Documentation is the following {content} \n"""
     return output
 
@@ -24,7 +25,8 @@ def check_requirements(DO_needed: Optional[str],
                         DI_needed: Optional[str],
                         PWD_needed: Optional[str],
                         AI_needed: Optional[str],
-                        Safety: Optional[str]
+                        Safety: Optional[str],
+                        Match: Optional[str],
                         ) -> str:
     """
     Check if all requirements are there, if it is optional it can be skipped
@@ -38,9 +40,10 @@ def check_requirements(DO_needed: Optional[str],
         PWD_needed: number of frequency inputs (PWD), optional
         AI_needed: number of analog inputs (AI), optional
         Safety: True or False, mandatory
+        Match: True or False, optional, set to True if missing
 
     Returns:
-        str: the missing information it there is one
+        str: the missing information it there is one, else success, mandatory data has been provided
     """
     # Temporary implementation to avoid syntax errors
     missing = []
@@ -54,7 +57,34 @@ def check_requirements(DO_needed: Optional[str],
     return f"Missing: {', '.join(missing)}" if missing else "All mandatory fields present"
 
 
-agent = ToolCallingAgent(tools=[get_datasheet_content, check_requirements], model=model)
+@tool
+def check_architecture_requirements(Architectures: str) -> str:
+    """
+    Check if a single architecture fits all information needed
+
+    Args:
+        Architectures: a list of all architectures found, shall follow the following structure
+            {[{Name: a name or title for this architecture, like "1x TTC 32"},
+            {Reference: the ECU reference, as an example TTC 580},
+            {Number: number of this reference needed to cover the need, shall be a number},
+            {Software: the platform, can only be C, MATCH, Codesys, Qt}]}
+
+    Returns:
+        str: the missing information it there is one, else success, mandatory data has been provided
+    """
+    # Temporary implementation to avoid syntax errors
+    missing = []
+    for Architecture in Architectures:
+        if not Reference:
+            missing.append("Reference")
+        if not Number:
+            missing.append("Number")
+        if not Software:
+            missing.append("Software")
+
+    return f"Missing: {', '.join(missing)}" if missing else "All mandatory fields present"
+
+agent = ToolCallingAgent(tools=[get_datasheet_content, check_requirements, check_architecture_requirements], model=model)
 
 managed_architecture_define_agent = ManagedAgent(
     agent=agent,
@@ -71,29 +101,31 @@ managed_architecture_define_agent = ManagedAgent(
         "Input": 11 AI + 7 DO + 1 PWM, 3 CAN, Codesys,
             "Output": [
             {
-              "Solution": "1x HY-TTC 32",
+              "Reference": "HY-TTC 32",
+              "Number": "1",
               "Programming": "Codesys"
             }
         ]
     }
     Example 2
-    Input: 21 AI + 7 DO + 16 PWM, C or Codesys
-    Output: 1x TTC510 Codesys or 1x TTC2310 in C or 3x TTC 2038 in C
+    {
+    "Input": 21 AI + 7 DO + 16 PWM, C or Codesys
+        "Output": [
         {
-        "Input": 21 AI + 7 DO + 16 PWM, C or Codesys
-            "Output": [
-            {
-              "Solution": "1x HY-TTC 510",
-              "Programming": "Codesys"
-            },
-            {
-              "Solution": "1x TTC 2310 (TTC 2785 variant)",
-              "Programming": "C"
-            },
-            {
-              "Solution": "2x TTC 32",
-              "Programming": "Codesys"
-            }
+          "Reference": "1x HY-TTC 510",
+          "Number": "1",
+          "Software": "Codesys"
+        },
+        {
+          "Reference": "1x TTC 2310 (TTC 2785 variant)",
+          "Number": "1",
+          "Software": "C"
+        },
+        {
+          "Reference": "2x TTC 32",
+          "Number": "2",
+          "Software": "Codesys"
+        }
         ]
     }
     """
