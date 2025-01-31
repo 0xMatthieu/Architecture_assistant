@@ -41,7 +41,11 @@ def create_price_architecture_report(data_str, output_format='pdf', output_path=
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
+    y_position = height - 100
     for product in data:
+        if y_position < 100:  # Start a new page if space is insufficient
+            c.showPage()
+            y_position = height - 100
         reference = product.get("Reference", "")
         designation = product.get("Designation", "")
         article_number = product.get("Article_number", "")
@@ -58,12 +62,16 @@ def create_price_architecture_report(data_str, output_format='pdf', output_path=
             file_path = os.path.join(output_path, f'{name}_report.pdf')
             c = canvas.Canvas(file_path, pagesize=letter)
             width, height = letter
-            c.drawString(100, height - 100, f"{name} Report")
-            c.drawString(100, height - 120, f"Reference: {reference}")
-            c.drawString(100, height - 140, f"Designation: {designation}")
-            c.drawString(100, height - 140, f"Article number: {article_number}")
-            c.drawString(100, height - 140, f"Quantity: {quantity}")
-            c.drawString(100, height - 140, f"Price: {price}")
+            c.drawString(100, y_position, f"Reference: {reference}")
+            y_position -= 20
+            c.drawString(100, y_position, f"Designation: {designation}")
+            y_position -= 20
+            c.drawString(100, y_position, f"Article number: {article_number}")
+            y_position -= 20
+            c.drawString(100, y_position, f"Quantity: {quantity}")
+            y_position -= 20
+            c.drawString(100, y_position, f"Price: {price}")
+            y_position -= 40  # Add extra space between entries
             c.save()
         else:
             raise ValueError("Unsupported format. Use 'pdf' or 'excel'.")
