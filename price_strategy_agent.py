@@ -44,7 +44,7 @@ def generate_report(architectures: list[dict], format_file: str = 'pdf') -> str:
     try:
 
         missing_info = []
-        data = json.loads(architectures)
+        data = architectures
         required_fields = {"Reference", "Designation", "Article_number", "Quantity", "Price"}
         for architecture in data:
             missing = []
@@ -65,7 +65,7 @@ def generate_report(architectures: list[dict], format_file: str = 'pdf') -> str:
         if missing_info:
             return "\n".join(missing_info)
 
-        report_path = create_price_architecture_report(Architectures, output_format=format_file)
+        report_path = create_price_architecture_report(data, output_format=format_file)
         return f"Report generated successfully: {report_path}"
     except Exception as e:
         return f"Failed to generate report: {e}"
