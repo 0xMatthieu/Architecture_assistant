@@ -20,6 +20,20 @@ The project is organized into several key files and directories:
 - **Data/**: Directory containing datasheets and price lists used by the application.
 - **.env**: Environment configuration file for setting up necessary environment variables.
 
+## Project Architecture
+
+The Architecture Assistant project is structured to facilitate the design and promotion of TTControl ECU architectures. Here's an overview of the architecture:
+
+- **Main.py**: Serves as the entry point of the application, initializing and running the agent.
+- **ai_agent.py**: Manages the configuration of the AI model and handles interactions with the agent.
+- **Utils.py**: Provides utility functions for reading datasheets, generating reports, and handling Excel files.
+- **price_strategy_agent.py**: Contains tools for generating price and architecture reports and managing the price strategy agent.
+- **architecture_agent.py**: Offers tools for checking architecture requirements and formatting architecture data.
+- **Data/**: A directory that stores datasheets and price lists used by the application.
+- **.env**: A configuration file for setting up necessary environment variables.
+
+The project leverages a modular design, with each component responsible for specific functionalities, ensuring scalability and ease of maintenance.
+
 ## Setup
 
 1. **Clone the Repository**:
