@@ -16,10 +16,7 @@ def get_datasheet_content() -> str:
 
         str: the content of all documents, it is raw data which will be used to define architecture
     """
-    #content = read_datasheet_contents(folder_path='./Data/Datasheet')
-    content = read_excel_page(folder_path='./Data/Test', sheet_number=0)
-    output = f"""## Documentation is the following {content} \n"""
-    return output
+    return read_excel_page(folder_path='./Data/Test', sheet_number=0)
 
 @tool
 def check_requirements(requirements: dict) -> str:
@@ -98,6 +95,12 @@ def format_architecture(architectures: list[dict]) -> dict[str, str, list[dict] 
             missing_info.append(f"Architecture {architecture.get('name', 'Unnamed')}: Missing {', '.join(missing)}")
 
     datasheet = get_datasheet_content()
+    if datasheet is None or datasheet.empty:
+        return {
+            "missing_info": "Datasheet content is empty or not loaded properly.",
+            "architecture_can_be_done": "No architecture can be validated due to missing datasheet.",
+            "architectures": architectures
+        }
 
 
     architecture_can_be_done= []
