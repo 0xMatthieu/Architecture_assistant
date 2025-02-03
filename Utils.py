@@ -21,17 +21,16 @@ def read_datasheet_contents(folder_path='./Data/Datasheet'):
                 print(f"Could not read file {file_path}: {e}")
     return pdf_contents
 
-def read_first_page_excel(folder_path='./Data/Price'):
-    excel_contents = []
+def read_excel_page(folder_path='./Data/Test', sheet_number=0):
+    df = None
     for filename in os.listdir(folder_path):
         file_path = os.path.join(folder_path, filename)
         if os.path.isfile(file_path) and filename.lower().endswith('.xlsx'):
             try:
-                df = pd.read_excel(file_path, sheet_name=0)
-                excel_contents.append(df)
+                df = pd.read_excel(file_path, sheet_name=sheet_number)
             except Exception as e:
                 print(f"Could not read file {file_path}: {e}")
-    return excel_contents
+    return df
 
 
 def create_price_architecture_report(data_str, output_format='pdf', output_path='./Data/Report'):
