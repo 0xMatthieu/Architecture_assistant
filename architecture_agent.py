@@ -93,6 +93,10 @@ def format_architecture(architectures: list[Architecture]) -> dict[str, list[Arc
     if isinstance(architectures, dict):
         architectures = list(architectures.values())
 
+    # Convert dictionaries to Architecture instances if needed
+    if isinstance(architectures, list) and isinstance(architectures[0], dict):
+        architectures = [Architecture(**arch) for arch in architectures]
+
     data = []
     for arch in architectures:
         data.append({
