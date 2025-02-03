@@ -77,7 +77,7 @@ def check_requirements(DO_needed: Optional[str],
 
 
 @tool
-def format_architecture(Architectures: str) -> dict[str, str | Any]:
+def format_architecture(architectures: list[Architecture] | dict[str, Architecture]) -> dict[str, str | Any]:
     """
     Check if a single architecture fits all information needed
 
@@ -90,7 +90,17 @@ def format_architecture(Architectures: str) -> dict[str, str | Any]:
     """
     missing_info = []
     data_updated = False
-    data = json.loads(Architectures)
+    if isinstance(architectures, dict):
+        architectures = list(architectures.values())
+
+    data = []
+    for arch in architectures:
+        data.append({
+            "Name": arch.Name,
+            "Reference": arch.Reference,
+            "Number": arch.Number,
+            "Software": arch.Software
+        })
     required_fields = {"Name", "Reference", "Number", "Software"}
     for architecture in data:
         # Remove unnecessary fields
