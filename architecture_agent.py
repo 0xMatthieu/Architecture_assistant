@@ -127,7 +127,7 @@ def format_architecture(architectures: list[Architecture]) -> dict[str, list[Arc
 
     return {
         "missing_info": "\n".join(missing_info) if missing_info else "All mandatory fields present",
-        "data": data if data_updated else Architectures
+        "data": data if data_updated else architectures
     }
 
 agent = ToolCallingAgent(tools=[get_datasheet_content, check_requirements, format_architecture], model=model)
