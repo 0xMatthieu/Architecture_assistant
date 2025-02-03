@@ -99,10 +99,29 @@ def format_architecture(architectures: list[dict]) -> dict[str, list[str], list[
 
     datasheet = get_datasheet_content()
 
+    architecture_can_be_done = []
+    for architecture in architectures:
+        ref = architecture.get("reference")
+        software = architecture.get("software")
+
+        # Check if the reference and software combination exists in the datasheet
+        if not datasheet.empty and ref in datasheet['Reference'].values:
+            software_column = datasheet.columns.str.contains(software, case=False)
+            if software_column.any():
+                software_available = datasheet.loc[datasheet['Reference'] == ref, software_column].values[0]
+                if software_available == "Yes":
+                    architecture_can_be_done.append(f"Architecture {architecture.get('name', 'Unnamed')} can be done.")
+                else:
+                    architecture_can_be_done.append(f"Architecture {architecture.get('name', 'Unnamed')} cannot be done: Software not available.")
+            else:
+                architecture_can_be_done.append(f"Architecture {architecture.get('name', 'Unnamed')} cannot be done: Software column not found.")
+        else:
+            architecture_can_be_done.append(f"Architecture {architecture.get('name', 'Unnamed')} cannot be done: Reference not found.")
+
 
     return {
         "missing_info": "\n".join(missing_info) if missing_info else "All mandatory fields present",
-        "architecture_can_be_done":
+        "architecture_can_be_done": architecture_can_be_done,
         "architectures": architectures
     }
 
