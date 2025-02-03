@@ -78,7 +78,7 @@ def format_architecture(architectures: list[dict]) -> dict[str, list[str], list[
     data_updated = False
 
     required_fields = {"name", "reference", "number", "software"}
-    for architecture in architectures:
+    for i, architecture in enumerate(architectures):
         # Remove unnecessary fields
         keys_to_remove = set(architecture.keys()) - required_fields
         for key in keys_to_remove:
