@@ -27,7 +27,12 @@ def read_excel_page(folder_path='./Data/Test', sheet_number=0):
         file_path = os.path.join(folder_path, filename)
         if os.path.isfile(file_path) and filename.lower().endswith('.xlsx'):
             try:
-                df = pd.read_excel(file_path, sheet_name=sheet_number)
+                # Load the entire sheet to find the first non-empty row
+                temp_df = pd.read_excel(file_path, sheet_name=sheet_number, header=None)
+                # Find the first non-empty row
+                header_row = temp_df.apply(lambda row: row.notna().any(), axis=1).idxmax()
+                # Read the Excel file again using the detected header row
+                df = pd.read_excel(file_path, sheet_name=sheet_number, header=header_row)
             except Exception as e:
                 print(f"Could not read file {file_path}: {e}")
     return df
