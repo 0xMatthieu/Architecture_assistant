@@ -33,9 +33,26 @@ def get_price_list(architectures: list[dict]) -> list[dict]:
                 "price": "the prices found in list, for example [500, 400, 300]"
             }
     """
-    #content = read_datasheet_contents(folder_path='./Data/Price')
     df = read_excel_page(folder_path='./Data/Test', sheet_number=1)
-    return output
+    ecu_price_list = []
+
+    for architecture in architectures:
+        ref = architecture.get("reference")
+        software = architecture.get("software")
+
+        # Check if the reference and software match a line in the DataFrame
+        match = df[(df['Reference'] == ref) & (df['Software'] == software)]
+        if not match.empty:
+            for _, row in match.iterrows():
+                ecu_price_list.append({
+                    "reference": row["Reference"],
+                    "designation": row["Designation"],
+                    "article_number": row["Article_number"],
+                    "quantity": row["Quantity"],
+                    "price": row["Price"]
+                })
+
+    return ecu_price_list
 
 @tool
 def generate_report(architectures: list[dict], format_file: str = 'pdf') -> str:
