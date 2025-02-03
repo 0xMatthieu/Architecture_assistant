@@ -5,9 +5,11 @@ from smolagents import tool, ManagedAgent
 from typing import Optional
 from ai_agent import model
 from architecture_agent import format_architecture
+from prompt import MANAGED_AGENT_SHORT_PROMPT
 import json
 
 load_dotenv()
+
 
 @tool
 def get_price_list() -> str:
@@ -20,7 +22,7 @@ def get_price_list() -> str:
     return output
 
 @tool
-def generate_report(Architectures: str, format_file: str = 'pdf') -> str:
+def generate_report(architectures: list[dict], format_file: str = 'pdf') -> str:
     """
     Generates a report in the specified format (pdf or excel) containing price and architecture information.
 
@@ -42,7 +44,7 @@ def generate_report(Architectures: str, format_file: str = 'pdf') -> str:
     try:
 
         missing_info = []
-        data = json.loads(Architectures)
+        data = json.loads(architectures)
         required_fields = {"Reference", "Designation", "Article_number", "Quantity", "Price"}
         for architecture in data:
             missing = []
@@ -74,6 +76,7 @@ agent = ToolCallingAgent(tools=[get_price_list, generate_report, format_architec
 managed_price_agent = ManagedAgent(
     agent=agent,
     name="price_strategy_designer",
+    managed_agent_prompt=MANAGED_AGENT_SHORT_PROMPT,
     description="""You will be tasked to help design and promote the best TTControl ECU offer""",
     additional_prompting ="""You have to follow this steps to define the better solution:
         1: if there is already some architecture required, format them to get a JSON with all architecture
