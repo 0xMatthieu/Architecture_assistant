@@ -4,9 +4,28 @@ from smolagents.agents import ToolCallingAgent
 from smolagents import tool, ManagedAgent
 from typing import Optional, Any
 from ai_agent import model
+from prompt import MANAGED_AGENT_SHORT_PROMPT
 import json
 
 load_dotenv()
+
+
+class Architecture:
+    def __init__(self, Name: str, Reference: str, Number: int, Software: str):
+        """
+        {
+            "Name": "a name or title for this architecture, like '1x TTC 32'",
+            "Reference": "the ECU reference, as an example TTC 580",
+            "Number": "number of this reference needed to cover the need, shall be a number",
+            "Software": "the platform, can only be C, MATCH, Codesys, Qt"
+        }
+        """
+        self.Name = Name
+        self.Reference = Reference
+        self.Number = Number
+        self.Software = Software
+
+
 
 @tool
 def get_datasheet_content() -> str:
@@ -63,13 +82,7 @@ def format_architecture(Architectures: str) -> dict[str, str | Any]:
     Check if a single architecture fits all information needed
 
     Args:
-        Architectures: a list of all architectures found, shall follow the following structure
-            {
-                "Name": "a name or title for this architecture, like '1x TTC 32'",
-                "Reference": "the ECU reference, as an example TTC 580",
-                "Number": "number of this reference needed to cover the need, shall be a number",
-                "Software": "the platform, can only be C, MATCH, Codesys, Qt"
-            }
+        Architectures: an instance of Architecture class containing name, reference, number and software needed
 
     Returns:
         missing_info: the missing information it there is one, else success, mandatory data has been provided
@@ -109,39 +122,29 @@ managed_architecture_define_agent = ManagedAgent(
     agent=agent,
     name="architecture_designer",
     description="""You will be tasked to help design and promote the best TTControl ECU architecture""",
-    managed_agent_prompt="""You're a helpful agent named '{name}'.
-You have been submitted this task by your manager.
----
-Task:
-{task}
----
-You're helping your manager solve a wider task: so make sure to provide a short answer in JSON format
-
-If your task resolution is not successful, please return as much context as possible, 
-so that your manager can act upon this feedback.
-{{additional_prompting}}""",
+    managed_agent_prompt=MANAGED_AGENT_SHORT_PROMPT,
     additional_prompting ="""You have to follow this steps to define the better solution:
-        1: check if there is no missing arguments, you have to have enough information
-        2: get all technical information like datasheet and all documentation to better know the ECU product portfolio
-        3: define best solutions, provide 3 solutions in JSON format and check that all arguments have been provided
-        
-        As soon as you have a JSON list with 3 solutions, you can return this list in JSON format
-        
-        below is an example of expected output
-        
-        {"Architecture":[
-            {
-                "Name": "2x TTC 32",
-                "Reference": "TTC 32",
-                "Number": "2",
-                "Software": "Codesys"
-            },
-            {
-                "Name": "1x TTC 580",
-                "Reference": "TTC 580",
-                "Number": "1",
-                "Software": "MATCH"
-            }
-        ]}
-    """
+1: check if there is no missing arguments, you have to have enough information
+2: get all technical information like datasheet and all documentation to better know the ECU product portfolio
+3: define best solutions, provide 3 solutions in JSON format and check that all arguments have been provided
+
+As soon as you have a JSON list with 3 solutions, you can return this list in JSON format
+
+below is an example of expected output
+
+{"Architecture":[
+    {
+        "Name": "2x TTC 32",
+        "Reference": "TTC 32",
+        "Number": "2",
+        "Software": "Codesys"
+    },
+    {
+        "Name": "1x TTC 580",
+        "Reference": "TTC 580",
+        "Number": "1",
+        "Software": "MATCH"
+    }
+]}
+"""
 )
