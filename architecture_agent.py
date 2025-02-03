@@ -11,7 +11,7 @@ load_dotenv()
 
 
 class Architecture:
-    def __init__(self, Name: str, Reference: str, Number: int, Software: str):
+    def __init__(self, name: str, reference: str, number: int, software: str):
         """
         {
             "Name": "a name or title for this architecture, like '1x TTC 32'",
@@ -20,10 +20,10 @@ class Architecture:
             "Software": "the platform, can only be C, MATCH, Codesys, Qt"
         }
         """
-        self.Name = Name
-        self.Reference = Reference
-        self.Number = Number
-        self.Software = Software
+        self.name = name
+        self.reference = reference
+        self.number = number
+        self.software = software
 
 
 
@@ -77,16 +77,16 @@ def check_requirements(DO_needed: Optional[str],
 
 
 @tool
-def format_architecture(architectures: list[Architecture] | dict[str, Architecture]) -> dict[str, str | Any]:
+def format_architecture(architectures: list[Architecture]) -> dict[str, list[Architecture] | Any]:
     """
     Check if a single architecture fits all information needed
 
     Args:
-        Architectures: an instance of Architecture class containing name, reference, number and software needed
+        architectures: a list of Architecture classes containing name, reference, number and software needed
 
     Returns:
         missing_info: the missing information it there is one, else success, mandatory data has been provided
-        data: updated Architectures in JSON format with only mandatory fields
+        data: updated Architectures class with only mandatory fields
     """
     missing_info = []
     data_updated = False
@@ -96,12 +96,12 @@ def format_architecture(architectures: list[Architecture] | dict[str, Architectu
     data = []
     for arch in architectures:
         data.append({
-            "Name": arch.Name,
-            "Reference": arch.Reference,
-            "Number": arch.Number,
-            "Software": arch.Software
+            "name": arch.name,
+            "reference": arch.reference,
+            "number": arch.number,
+            "software": arch.software
         })
-    required_fields = {"Name", "Reference", "Number", "Software"}
+    required_fields = {"name", "reference", "number", "software"}
     for architecture in data:
         # Remove unnecessary fields
         keys_to_remove = set(architecture.keys()) - required_fields
@@ -109,21 +109,21 @@ def format_architecture(architectures: list[Architecture] | dict[str, Architectu
             del architecture[key]
             data_updated = True
         missing = []
-        if not architecture.get("Name"):
-            missing.append("Name")
-        if not architecture.get("Reference"):
-            missing.append("Reference")
-        if not architecture.get("Number"):
-            missing.append("Number")
-        if not architecture.get("Software"):
-            missing.append("Software")
+        if not architecture.get("name"):
+            missing.append("name")
+        if not architecture.get("reference"):
+            missing.append("reference")
+        if not architecture.get("number"):
+            missing.append("number")
+        if not architecture.get("software"):
+            missing.append("software")
         
         if missing:
-            missing_info.append(f"Architecture {architecture.get('Name', 'Unnamed')}: Missing {', '.join(missing)}")
+            missing_info.append(f"Architecture {architecture.get('name', 'Unnamed')}: Missing {', '.join(missing)}")
 
     return {
         "missing_info": "\n".join(missing_info) if missing_info else "All mandatory fields present",
-        "data": data if data_updated else architectures
+        "data": data if data_updated else Architectures
     }
 
 agent = ToolCallingAgent(tools=[get_datasheet_content, check_requirements, format_architecture], model=model)
