@@ -55,7 +55,7 @@ def check_requirements(requirements: dict) -> str:
 
 
 @tool
-def format_architecture(architectures: list[dict]) -> dict[str, list[str], list[dict] | Any]:
+def format_architecture(architectures: list[dict]) -> dict[str, str, list[dict] | Any]:
     """
     Check if a single architecture fits all information needed
 
@@ -71,7 +71,7 @@ def format_architecture(architectures: list[dict]) -> dict[str, list[str], list[
     Returns:
         missing_info: the missing information it there is one, else success, mandatory data has been provided
         architecture_can_be_done: detail for each architecture if there is no incoherence,
-            like a software version not available for this reference
+            like a software version not available for this reference. If an architecture cannot be done, a new one shall be defined
         architectures: updated dict with only mandatory fields, same as input if missing_info is empty
     """
     missing_info = []
@@ -99,29 +99,33 @@ def format_architecture(architectures: list[dict]) -> dict[str, list[str], list[
 
     datasheet = get_datasheet_content()
 
-    architecture_can_be_done = [""] * len(architectures)
+
+    architecture_can_be_done= []
     for architecture in architectures:
         ref = architecture.get("reference")
         software = architecture.get("software")
+        architecture_issue = []
 
         # Check if the reference and software combination exists in the datasheet
-        if not datasheet.empty and ref in datasheet['Reference'].values:
+        if ref in datasheet['Reference'].values:
             software_column = datasheet.columns.str.contains(software, case=False)
             if software_column.any():
                 software_available = datasheet.loc[datasheet['Reference'] == ref, software_column].values[0]
                 if software_available == "Yes":
-                    architecture_can_be_done[i] = f"Architecture {architecture.get('name', 'Unnamed')} can be done."
+                    architecture_issue.append(f"Architecture {architecture.get('name', 'Unnamed')} can be done.")
                 else:
-                    architecture_can_be_done[i] = f"Architecture {architecture.get('name', 'Unnamed')} cannot be done: Software not available."
+                    architecture_issue.append(f"Architecture {architecture.get('name', 'Unnamed')} cannot be done: Software not available.")
             else:
-                architecture_can_be_done[i] = f"Architecture {architecture.get('name', 'Unnamed')} cannot be done: Software column not found."
+                architecture_issue.append(f"Architecture {architecture.get('name', 'Unnamed')} cannot be done: Software column not found.")
         else:
-            architecture_can_be_done[i] = f"Architecture {architecture.get('name', 'Unnamed')} cannot be done: Reference not found."
+            architecture_issue.append(f"Architecture {architecture.get('name', 'Unnamed')} cannot be done: Reference not found.")
 
+        if architecture_issue:
+            architecture_can_be_done.append(f"Architecture {architecture.get('name', 'Unnamed')}: Error {', '.join(architecture_issue)}")
 
     return {
         "missing_info": "\n".join(missing_info) if missing_info else "All mandatory fields present",
-        "architecture_can_be_done": architecture_can_be_done,
+        "architecture_can_be_done":  "\n".join(architecture_can_be_done) if architecture_issue else "No issue in architecture",
         "architectures": architectures
     }
 
