@@ -99,7 +99,7 @@ def format_architecture(architectures: list[dict]) -> dict[str, list[str], list[
 
     datasheet = get_datasheet_content()
 
-    architecture_can_be_done = []
+    architecture_can_be_done = [""] * len(architectures)
     for architecture in architectures:
         ref = architecture.get("reference")
         software = architecture.get("software")
@@ -110,13 +110,13 @@ def format_architecture(architectures: list[dict]) -> dict[str, list[str], list[
             if software_column.any():
                 software_available = datasheet.loc[datasheet['Reference'] == ref, software_column].values[0]
                 if software_available == "Yes":
-                    architecture_can_be_done.append(f"Architecture {architecture.get('name', 'Unnamed')} can be done.")
+                    architecture_can_be_done[i] = f"Architecture {architecture.get('name', 'Unnamed')} can be done."
                 else:
-                    architecture_can_be_done.append(f"Architecture {architecture.get('name', 'Unnamed')} cannot be done: Software not available.")
+                    architecture_can_be_done[i] = f"Architecture {architecture.get('name', 'Unnamed')} cannot be done: Software not available."
             else:
-                architecture_can_be_done.append(f"Architecture {architecture.get('name', 'Unnamed')} cannot be done: Software column not found.")
+                architecture_can_be_done[i] = f"Architecture {architecture.get('name', 'Unnamed')} cannot be done: Software column not found."
         else:
-            architecture_can_be_done.append(f"Architecture {architecture.get('name', 'Unnamed')} cannot be done: Reference not found.")
+            architecture_can_be_done[i] = f"Architecture {architecture.get('name', 'Unnamed')} cannot be done: Reference not found."
 
 
     return {
