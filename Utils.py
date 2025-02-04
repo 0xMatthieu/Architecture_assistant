@@ -64,21 +64,11 @@ def create_price_architecture_report(data_str, output_format='pdf', output_path=
             if y_position < 100:  # Start a new page if space is insufficient
                 c.showPage()
                 y_position = height - 100
-            reference = row.get("Reference", "")
-            designation = row.get("Designation", "")
-            article_number = row.get("Article_number", "")
-            quantity = row.get("Quantity", "")
-            price = row.get("Price", "")
-            c.drawString(100, y_position, f"Reference: {reference}")
-            y_position -= 20
-            c.drawString(100, y_position, f"Designation: {designation}")
-            y_position -= 20
-            c.drawString(100, y_position, f"Article number: {article_number}")
-            y_position -= 20
-            c.drawString(100, y_position, f"Quantity: {quantity}")
-            y_position -= 20
-            c.drawString(100, y_position, f"Price: {price}")
-            y_position -= 40  # Add extra space between entries
+            for field in required_fields:
+                value = row.get(field.replace("_", " ").title(), "")
+                c.drawString(100, y_position, f"{field.replace('_', ' ').title()}: {value}")
+                y_position -= 20
+            y_position -= 20  # Add extra space between entries
         c.save()
     else:
         raise ValueError("Unsupported format. Use 'pdf' or 'excel'.")
