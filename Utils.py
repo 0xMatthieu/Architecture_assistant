@@ -33,13 +33,15 @@ def read_excel_page(folder_path='./Data/Test', sheet_number=0):
                 header_row = temp_df.apply(lambda row: row.notna().any(), axis=1).idxmax()
                 # Read the Excel file again using the detected header row
                 df = pd.read_excel(file_path, sheet_name=sheet_number, header=header_row)
+                # Remove leading and trailing spaces from string data
+                df = df.applymap(lambda x: x.strip() if isinstance(x, str) else x)
             except Exception as e:
                 print(f"Could not read file {file_path}: {e}")
     return df
 
 
 def create_price_architecture_report(data_str, output_format='pdf', output_path='./Data/Report'):
-    data = json.loads(data_str)
+    data = data_str
     file_path = None
     name = 'test'
     df = pd.DataFrame(data)
@@ -55,6 +57,9 @@ def create_price_architecture_report(data_str, output_format='pdf', output_path=
         c = canvas.Canvas(file_path, pagesize=letter)
         width, height = letter
         y_position = height - 100
+        required_fields = {"reference", "designation", "article_number", "quantity_single_unit",
+                           "price_single_unit", "quantity_box", "price_box",
+                           "quantity_palette", "price_palette"}
         for index, row in df.iterrows():
             if y_position < 100:  # Start a new page if space is insufficient
                 c.showPage()
