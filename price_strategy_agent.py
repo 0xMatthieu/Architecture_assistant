@@ -10,10 +10,19 @@ import json
 
 load_dotenv()
 
+QUANTITY_SINGLE_UNIT = "Quantity single unit"
+PRICE_SINGLE_UNIT = "Price single unit"
+QUANTITY_BOX = "Quantity box"
+PRICE_BOX = "Price box"
+QUANTITY_PALETTE = "Quantity palette"
+PRICE_PALETTE = "Price palette"
+
 
 @tool
 def get_price_list(architectures: list[dict]) -> list[dict]:
     """
+    get price list and fill a list based on given architectures
+
     Args:
         architectures: a list of dict containing
         {
@@ -29,8 +38,12 @@ def get_price_list(architectures: list[dict]) -> list[dict]:
                 "reference": "the ECU reference, for example TTC 580",
                 "designation": "the ECU reference, for example HY-TTC 580-CD",
                 "article_number": "the ECU reference, for example 927891",
-                "quantity": "a list with requested quantities, for example [1, 20, 100]",
-                "price": "the prices found in list, for example [500, 400, 300]"
+                "quantity_single_unit": "the MOQ for a single unit",
+                "price_single_unit": "the price for a single unit"
+                "quantity_box": "the MOQ for a box",
+                "price_box": "the price for a box"
+                "quantity_palette": "the MOQ for a palette",
+                "price_palette": "the price for a palette"
             }
     """
     df = read_excel_page(folder_path='./Data/Test', sheet_number=1)
@@ -47,9 +60,13 @@ def get_price_list(architectures: list[dict]) -> list[dict]:
                 ecu_price_list.append({
                     "reference": row["Reference"],
                     "designation": row["Designation"],
-                    "article_number": row["Article_number"],
-                    "quantity": row["Quantity"],
-                    "price": row["Price"]
+                    "article_number": row["Article number"],
+                    "quantity_single_unit": row[QUANTITY_SINGLE_UNIT],
+                    "price_single_unit": row[PRICE_SINGLE_UNIT],
+                    "quantity_box": row[QUANTITY_BOX],
+                    "price_box": row[PRICE_BOX],
+                    "quantity_palette": row[QUANTITY_PALETTE],
+                    "price_palette": row[PRICE_PALETTE]
                 })
 
     return ecu_price_list
@@ -65,8 +82,12 @@ def generate_report(architectures: list[dict], format_file: str = 'pdf') -> str:
                 "reference": "the ECU reference, for example TTC 580",
                 "designation": "the ECU reference, for example HY-TTC 580-CD",
                 "article_number": "the ECU reference, for example 927891",
-                "quantity": "a list with requested quantities, for example [1, 20, 100]",
-                "price": "the prices found in list, for example [500, 400, 300]"
+                "quantity_single_unit": "the MOQ for a single unit",
+                "price_single_unit": "the price for a single unit"
+                "quantity_box": "the MOQ for a box",
+                "price_box": "the price for a box"
+                "quantity_palette": "the MOQ for a palette",
+                "price_palette": "the price for a palette"
             }
 
         format_file: The format of the report, either 'pdf' or 'excel'.
@@ -78,7 +99,7 @@ def generate_report(architectures: list[dict], format_file: str = 'pdf') -> str:
 
         missing_info = []
         data = architectures
-        required_fields = {"reference", "designation", "article_number", "quantity", "price"}
+        required_fields = {"reference", "designation", "article_number", "quantity_single_unit", "price_single_unit"}
         for architecture in data:
             missing = []
             if not architecture.get("reference"):
@@ -87,10 +108,10 @@ def generate_report(architectures: list[dict], format_file: str = 'pdf') -> str:
                 missing.append("designation")
             if not architecture.get("article_number"):
                 missing.append("article_number")
-            if not architecture.get("quantity"):
-                missing.append("quantity")
-            if not architecture.get("price"):
-                missing.append("price")
+            if not architecture.get("quantity_single_unit"):
+                missing.append("quantity_single_unit")
+            if not architecture.get("price_single_unit"):
+                missing.append("price_single_unit")
 
             if missing:
                 missing_info.append(f"Architecture {architecture.get('name', 'Unnamed')}: Missing {', '.join(missing)}")

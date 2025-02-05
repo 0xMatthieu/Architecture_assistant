@@ -65,8 +65,8 @@ def create_price_architecture_report(data_str, output_format='pdf', output_path=
                 c.showPage()
                 y_position = height - 100
             for field in required_fields:
-                value = row.get(field.replace("_", " ").title(), "")
-                c.drawString(100, y_position, f"{field.replace('_', ' ').title()}: {value}")
+                value = row.get(field, "")
+                c.drawString(100, y_position, f"{field.replace('_', ' ')first ve}: {value}")
                 y_position -= 20
             y_position -= 20  # Add extra space between entries
         c.save()

@@ -1,0 +1,16 @@
+#discord
+python-dotenv
+#pydantic
+smolagents
+openai
+litellm
+pymupdf
+pandas
+reportlab
+openpyxl
+
+#if want to debug
+#arize-phoenix
+#opentelemetry-sdk
+#opentelemetry-exporter-otlp
+#openinference-instrumentation-smolagents
